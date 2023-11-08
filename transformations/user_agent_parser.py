@@ -1,11 +1,19 @@
 from user_agents import parse
 
 
-# Function to parse user agent string
 def parse_user_agent(user_agent_str):
-    if (
-        user_agent_str == "Unknown"
-    ):  # If the user_agent_str is "Unknown", return "Unknown" for all values
+    """
+    Parses a user agent string and return device type, browser type, and browser version.
+
+    Parameters:
+    - user_agent_str (str): The user agent string to be parsed.
+
+    Returns:
+    - tuple: A tuple containing the device type, browser type, and browser version as strings.
+        If the user agent string is missing or empty, returns ("Unknown", "Unknown", "Unknown").
+
+    """
+    if not user_agent_str or user_agent_str == "" or user_agent_str == "''":
         return "Unknown", "Unknown", "Unknown"
 
     user_agent = parse(user_agent_str)

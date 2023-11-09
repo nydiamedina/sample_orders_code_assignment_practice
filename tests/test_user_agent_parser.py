@@ -16,6 +16,10 @@ def load_test_data():
     - list: A list of dictionaries, where each dictionary has two keys:
         'ua_string' containing the user agent string, and 'expected' containing
         the expected tuple result from the parse_user_agent function.
+
+    Raises:
+    - RuntimeError: If the test data file does not exist at the specified path.
+    - RuntimeError: If the test data file cannot be decoded as valid JSON.
     """
     try:
         with open(TEST_DATA_FILE_PATH, "r") as f:

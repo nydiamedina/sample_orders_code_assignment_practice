@@ -1,18 +1,23 @@
 import gzip
 import json
 import pandas as pd
+import os
 from transformations.user_agent_parser import parse_user_agent
 
 # File paths constants
-INPUT_FILE = "data/input/sample_orders.json.gz"
-OUTPUT_FILE = "data/output/sample_orders_transformed.json.gz"
+INPUT_FILE_PATH = os.path.join(
+    os.path.dirname(__file__), "data/input/sample_orders.json.gz"
+)
+OUTPUT_FILE_PATH = os.path.join(
+    os.path.dirname(__file__), "data/output/sample_orders_transformed.json.gz"
+)
 
 
 def read_data(file_name):
     """
-    Reads a gzipped JSON lines file into a pandas DataFrame.
+    Read a gzipped JSON lines file into a pandas DataFrame.
 
-    Parameters:
+    Args:
     - file_name (str): The path to the gzipped JSON lines file.
 
     Returns:
@@ -38,9 +43,9 @@ def read_data(file_name):
 
 def save_data_as_compressed_json(data, file_name):
     """
-    Writes the provided DataFrame to a gzipped JSON file.
+    Write the provided DataFrame to a gzipped JSON file.
 
-    Parameters:
+    Args:
     - data (DataFrame): The pandas DataFrame to write to file.
     - file_name (str): The name of the output file including the path.
 
@@ -64,7 +69,7 @@ def save_data_as_compressed_json(data, file_name):
 
 def main():
     # Read data from a gzipped JSON lines file into a pandas DataFrame
-    sample_orders = read_data(INPUT_FILE)
+    sample_orders = read_data(INPUT_FILE_PATH)
 
     # Apply the parse_user_agent transformation function to the USER_AGENT column
     sample_orders[
@@ -74,7 +79,7 @@ def main():
     )
 
     # Write the transformed data back to a gzipped JSON lines file
-    save_data_as_compressed_json(sample_orders, OUTPUT_FILE)
+    save_data_as_compressed_json(sample_orders, OUTPUT_FILE_PATH)
 
 
 if __name__ == "__main__":

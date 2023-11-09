@@ -3,6 +3,10 @@ import json
 import pandas as pd
 from transformations.user_agent_parser import parse_user_agent
 
+# File paths constants
+INPUT_FILE = "data/input/sample_orders.json.gz"
+OUTPUT_FILE = "data/output/sample_orders_transformed.json.gz"
+
 
 def read_data(file_name):
     """
@@ -60,7 +64,7 @@ def save_data_as_compressed_json(data, file_name):
 
 def main():
     # Read data from a gzipped JSON lines file into a pandas DataFrame
-    sample_orders = read_data("sample_orders.json.gz")
+    sample_orders = read_data(INPUT_FILE)
 
     # Apply the parse_user_agent transformation function to the USER_AGENT column
     sample_orders[
@@ -70,7 +74,7 @@ def main():
     )
 
     # Write the transformed data back to a gzipped JSON lines file
-    save_data_as_compressed_json(sample_orders, "sample_orders_transformed.json.gz")
+    save_data_as_compressed_json(sample_orders, OUTPUT_FILE)
 
 
 if __name__ == "__main__":

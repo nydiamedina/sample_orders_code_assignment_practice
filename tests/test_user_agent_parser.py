@@ -1,7 +1,6 @@
 import pytest
-from sample_orders_code_assignment.transformations.user_agent_parser import (
-    parse_user_agent,
-)
+from app.transformations.user_agent_parser import parse_user_agent
+
 
 # List of tuples containing a user agent string and the expected results
 test_data = [

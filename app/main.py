@@ -33,6 +33,7 @@ def read_data(file_name):
     - IOError: If the file cannot be opened or read.
     - ValueError: If a line in the file cannot be decoded as JSON.
     """
+
     try:
         with gzip.open(file_name, "rt", encoding="utf-8") as f:
             # List comprehension reads and converts each JSON line to a dictionary
@@ -62,6 +63,9 @@ def save_data_as_compressed_json(data, file_name):
     - IOError: If the file cannot be opened or written to.
     - Exception: For other exceptions that are not IOError.
     """
+
+    # Ensure the directory exists
+    os.makedirs(os.path.dirname(file_name), exist_ok=True)
 
     # Write the DataFrame to a gzipped JSON file
     try:

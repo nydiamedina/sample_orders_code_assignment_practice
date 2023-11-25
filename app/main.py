@@ -4,13 +4,14 @@ import logging
 import pandas as pd
 import os
 from transformations.user_agent_parser import parse_user_agent
+from validations.data_validations import validate_raw_data
 
 # Logging setup
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-# File paths constants
+# onstants
 INPUT_FILE_PATH = os.path.join(
     os.path.dirname(__file__), "data/input/sample_orders.json.gz"
 )
@@ -79,9 +80,21 @@ def save_data_as_compressed_json(data, file_name):
 
 def main():
     logging.info("Starting the data transformation process.")
+
     try:
         # Read data from a gzipped JSON lines file into a pandas DataFrame
         sample_orders = read_data(INPUT_FILE_PATH)
+
+        # Validate the data
+        validation_results = validate_raw_data(sample_orders)
+
+        # Check validation results
+        if validation_results["success"]:
+            logging.info("Raw data validation passed.")
+        else:
+            logging.error(
+                f"Raw data validation failed: {validation_results['failed_expectations']}"
+            )
 
         # Apply the parse_user_agent transformation function to the USER_AGENT column
         logging.info("Applying user agent parser transformation.")

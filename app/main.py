@@ -4,7 +4,7 @@ import logging
 import pandas as pd
 import os
 from great_expectations import get_context
-from transformations.user_agent_parser import parse_user_agent
+from transformations.transformation_factory import TransformationFactory
 from validations.data_validations import perform_and_save_raw_data_validation
 
 # Logging setup
@@ -104,19 +104,14 @@ def main():
                 f"Raw data validation failed: {validation_results['failed_expectations']}"
             )
 
-        # Apply the parse_user_agent transformation function to the USER_AGENT column
+        # Get a user agent transformation instance from the factory and apply it
         logging.info("Applying user agent parser transformation.")
-        sample_orders[
-            ["DEVICE_TYPE", "BROWSER_TYPE", "BROWSER_VERSION"]
-        ] = sample_orders.apply(
-            lambda row: parse_user_agent(row["USER_AGENT"]),
-            axis=1,
-            result_type="expand",
-        )
+        transformation = TransformationFactory.get_transformation("user_agent")
+        transformed_data = transformation.transform(sample_orders)
 
         # Write the transformed data back to a gzipped JSON lines file
         logging.info("Saving the transformed data.")
-        save_data_as_compressed_json(sample_orders, OUTPUT_FILE_PATH)
+        save_data_as_compressed_json(transformed_data, OUTPUT_FILE_PATH)
 
         logging.info("Data processing and validation completed successfully.")
 

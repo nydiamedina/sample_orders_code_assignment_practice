@@ -91,6 +91,7 @@ def main():
         sample_orders = read_data(INPUT_FILE_PATH)
 
         # Validate the data
+        # TODO: Validate transformed data as well
         validation_results = perform_and_save_raw_data_validation(
             sample_orders, RAW_DATA_EXPECTATION_SUITE
         )

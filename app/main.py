@@ -3,21 +3,23 @@ import json
 import logging
 import pandas as pd
 import os
+from great_expectations import get_context
 from transformations.user_agent_parser import parse_user_agent
-from validations.data_validations import validate_raw_data
+from validations.data_validations import perform_and_save_raw_data_validation
 
 # Logging setup
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-# onstants
+# Constants
 INPUT_FILE_PATH = os.path.join(
     os.path.dirname(__file__), "data/input/sample_orders.json.gz"
 )
 OUTPUT_FILE_PATH = os.path.join(
     os.path.dirname(__file__), "data/output/sample_orders_transformed.json.gz"
 )
+RAW_DATA_EXPECTATION_SUITE = "raw_user_agent_data_suite"
 
 
 def read_data(file_name):
@@ -82,11 +84,16 @@ def main():
     logging.info("Starting the data transformation process.")
 
     try:
+        # Initialize Great Expectations DataContext
+        context = get_context()
+
         # Read data from a gzipped JSON lines file into a pandas DataFrame
         sample_orders = read_data(INPUT_FILE_PATH)
 
         # Validate the data
-        validation_results = validate_raw_data(sample_orders)
+        validation_results = perform_and_save_raw_data_validation(
+            sample_orders, RAW_DATA_EXPECTATION_SUITE
+        )
 
         # Check validation results
         if validation_results["success"]:
@@ -110,7 +117,7 @@ def main():
         logging.info("Saving the transformed data.")
         save_data_as_compressed_json(sample_orders, OUTPUT_FILE_PATH)
 
-        logging.info("Data transformation process completed successfully.")
+        logging.info("Data processing and validation completed successfully.")
 
     except Exception as e:
         logging.error(f"An error occurred during the data transformation process: {e}")

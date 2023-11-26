@@ -1,17 +1,23 @@
+import logging
+from datetime import datetime
+from great_expectations import get_context
 from great_expectations.dataset import PandasDataset
-from great_expectations.data_context import DataContext
 
 
-def validate_raw_data(data_frame):
+def perform_and_save_raw_data_validation(data_frame, suite_name):
     """
-    Apply raw data expectations to the given DataFrame, validate it, and return the results.
+    Apply expectations, validate the DataFrame, and save the validation results.
 
     Args:
-    - data_frame (DataFrame): The pandas DataFrame to validate.
+    - data_frame (DataFrame): The DataFrame to validate.
+    - suite_name (str): The name of the expectation suite.
 
     Returns:
-    - dict: A dictionary containing the validation results.
+    - dict: Validation results.
     """
+    # Get the Great Expectations context
+    context = get_context()
+
     # Convert DataFrame to Great Expectations Dataset
     ge_df = PandasDataset(data_frame)
 
@@ -23,6 +29,13 @@ def validate_raw_data(data_frame):
 
     # Perform validation
     validation_results = ge_df.validate()
+
+    # Save the ExpectationSuite
+    # TODO: Use update_expectation_suite or add_or_update_expectation_suite instead
+    context.save_expectation_suite(ge_df.get_expectation_suite(), suite_name)
+
+    # Build Data Docs
+    context.build_data_docs()
 
     # Prepare and return summary of results
     results_summary = {

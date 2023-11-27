@@ -1,5 +1,5 @@
-from .user_agent_transformation import UserAgentTransformation
-
+from transformations.pandas_user_agent_transformation import PandasUserAgentTransformation
+from transformations.spark_user_agent_transformation import SparkUserAgentTransformation
 
 class TransformationFactory:
     """
@@ -20,8 +20,9 @@ class TransformationFactory:
         Raises:
             ValueError: If the transformation type is not recognized.
         """
-        if transformation_type == "user_agent":
-            return UserAgentTransformation()
-        # Add more elif statements for other transformation types
+        if transformation_type == "pandas_user_agent":
+            return PandasUserAgentTransformation()
+        elif transformation_type == "spark_user_agent":
+            return SparkUserAgentTransformation()
         else:
             raise ValueError("Transformation type not recognized.")

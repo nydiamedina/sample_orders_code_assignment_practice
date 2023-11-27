@@ -3,7 +3,8 @@ import json
 import logging
 import pandas as pd
 import os
-from great_expectations import get_context
+from pyspark.sql import SparkSession
+from pyspark.sql.utils import AnalysisException
 from transformations.transformation_factory import TransformationFactory
 from validations.data_validations import perform_and_save_raw_data_validation
 
@@ -22,7 +23,7 @@ OUTPUT_FILE_PATH = os.path.join(
 RAW_DATA_EXPECTATION_SUITE = "raw_user_agent_data_suite"
 
 
-def read_data(file_name):
+def read_data_to_pandas_df(file_name):
     """
     Read a gzipped JSON lines file into a pandas DataFrame.
 
@@ -49,6 +50,35 @@ def read_data(file_name):
         raise IOError(f"Error opening or reading the file {file_name}: {e}")
     except ValueError as e:
         raise ValueError(f"Error decoding JSON from {file_name}: {e}")
+
+
+def read_data_to_spark_df(file_path):
+    """
+    Reads a gzipped JSON lines file into a Spark DataFrame.
+
+    Args:
+        file_path (str): The path to the gzipped JSON lines file.
+
+    Returns:
+        pyspark.sql.DataFrame: A Spark DataFrame containing the data from the JSON lines file.
+
+    Raises:
+        FileNotFoundError: If the file cannot be found.
+        AnalysisException: If there is an error in reading the JSON file.
+        Exception: For other exceptions that might occur.
+    """
+    try:
+        spark = SparkSession.builder.appName(
+            "SparkUserAgentTransformation"
+        ).getOrCreate()
+        spark_df = spark.read.json(file_path)
+        return spark_df
+    except FileNotFoundError as e:
+        raise FileNotFoundError(f"Error finding the file {file_path}: {e}")
+    except AnalysisException as e:
+        raise AnalysisException(f"Error analyzing JSON from {file_path}: {e}")
+    except Exception as e:
+        raise Exception(f"An unexpected error occurred: {e}")
 
 
 def save_data_as_compressed_json(data, file_name):
@@ -84,8 +114,9 @@ def main():
     logging.info("Starting the data transformation process.")
 
     try:
+        # Pandas Implementation
         # Read data from a gzipped JSON lines file into a pandas DataFrame
-        sample_orders = read_data(INPUT_FILE_PATH)
+        sample_orders = read_data_to_pandas_df(INPUT_FILE_PATH)
 
         # Validate the data
         # TODO: Validate transformed data as well
@@ -103,12 +134,25 @@ def main():
 
         # Get a user agent transformation instance from the factory and apply it
         logging.info("Applying user agent parser transformation.")
-        transformation = TransformationFactory.get_transformation("user_agent")
+        transformation = TransformationFactory.get_transformation("pandas_user_agent")
         transformed_data = transformation.transform(sample_orders)
 
         # Write the transformed data back to a gzipped JSON lines file
         logging.info("Saving the transformed data.")
         save_data_as_compressed_json(transformed_data, OUTPUT_FILE_PATH)
+
+        # Spark Implementation
+        # Read the data using the Spark-specific function and get the Spark session
+        spark_df = read_data_to_spark_df(INPUT_FILE_PATH)
+
+        # Use the factory to get a Spark user agent transformation
+        transformation = TransformationFactory.get_transformation("spark_user_agent")
+
+        # Apply the transformation
+        transformed_spark_df = transformation.transform(spark_df)
+
+        # For testing purposes, print the first 5 rows of the transformed Spark DataFrame
+        transformed_spark_df.show(5)
 
         logging.info("Data processing and validation completed successfully.")
 

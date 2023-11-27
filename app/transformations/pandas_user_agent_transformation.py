@@ -3,7 +3,7 @@ from transformations.base_transformation import BaseTransformation
 from user_agents import parse
 
 
-class UserAgentTransformation(BaseTransformation):
+class PandasUserAgentTransformation(BaseTransformation):
     """
     Transformation class to parse user agent strings.
     """

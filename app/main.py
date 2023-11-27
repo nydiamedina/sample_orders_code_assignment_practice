@@ -84,9 +84,6 @@ def main():
     logging.info("Starting the data transformation process.")
 
     try:
-        # Initialize Great Expectations DataContext
-        context = get_context()
-
         # Read data from a gzipped JSON lines file into a pandas DataFrame
         sample_orders = read_data(INPUT_FILE_PATH)
 
